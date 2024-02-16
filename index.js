@@ -9,17 +9,24 @@ module.exports = function (opts) {
   const offsetMs = opts.offsetMs || 0
 
   const TIME_FORMAT = 'HH:mm:ss.SSS'
+  const TIME_FORMAT_SHORT = 'mm:ss.SSS'
   const TIME_SEPARATOR = ' --> '
 
   function parseTimes (line) {
     return line.split(TIME_SEPARATOR)
-      .map(timeString => moment(timeString.trim(), TIME_FORMAT))
+      .map(timeString => moment(timeString.trim(), getTimeFormat(timeString)))
   }
 
   function shiftTimeLine (line, offsetMs) {
     return parseTimes(line)
       .map(time => time.add(offsetMs, 'ms').format(TIME_FORMAT))
       .join(TIME_SEPARATOR)
+  }
+
+  function getTimeFormat (timestring) {
+     //hours on VTT files are optional
+     //if the lenth of the timestring is less 9 characters or less, assume it's short, otherwise the standard
+     return timestring.trim().length <= 9 ? TIME_FORMAT_SHORT : TIME_FORMAT
   }
 
   function isTimeLine (line) {
